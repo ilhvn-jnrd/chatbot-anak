@@ -6,12 +6,12 @@ export default async function handler(req, res) {
     const { message } = req.body;
 
     try {
-        // Pengecekan pertama: Apakah Vercel benar-benar membaca API Key?
         if (!process.env.GEMINI_API_KEY) {
             return res.status(500).json({ error: 'Vercel belum membaca API Key. Brankas kosong.' });
         }
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+        // PERUBAHAN DI SINI: Menggunakan versi terbaru gemini-2.5-flash
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -24,7 +24,6 @@ export default async function handler(req, res) {
 
         const data = await response.json();
         
-        // Menampilkan pesan error ASLI dari Google jika terjadi kegagalan
         if (data.error) {
             return res.status(500).json({ error: `🚨 Error dari Google: ${data.error.message}` });
         }
