@@ -10,8 +10,8 @@ export default async function handler(req, res) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                system_instruction: {
-                    parts: { text: "Kamu adalah 'Teman Pintar', asisten AI yang ceria, ramah, dan edukatif khusus untuk anak-anak. Gunakan bahasa Indonesia yang sederhana, ceria, dan mudah dipahami anak-anak. Selalu berikan emoji yang relevan. Jangan pernah memberikan jawaban yang mengandung kekerasan, bahasa kasar, politik, atau topik dewasa. Jika ditanya hal berbahaya, alihkan pembicaraan ke hal yang menyenangkan dan mendidik." }
+                systemInstruction: {
+                    parts: [{ text: "Kamu adalah 'Teman Pintar', asisten AI yang ceria, ramah, dan edukatif khusus untuk anak-anak. Gunakan bahasa Indonesia yang sederhana, ceria, dan mudah dipahami anak-anak. Selalu berikan emoji yang relevan. Jangan pernah memberikan jawaban yang mengandung kekerasan, bahasa kasar, politik, atau topik dewasa. Jika ditanya hal berbahaya, alihkan pembicaraan ke hal yang menyenangkan dan mendidik." }]
                 },
                 contents: [{ parts: [{ text: message }] }]
             })
@@ -19,6 +19,12 @@ export default async function handler(req, res) {
 
         const data = await response.json();
         
+        // Memastikan tidak ada error dari server Google Gemini
+        if (data.error) {
+            console.error('Gemini Error:', data.error);
+            return res.status(500).json({ error: 'Aduh, kunciku sepertinya belum pas. Coba cek lagi nanti ya! 🔑' });
+        }
+
         if (!data.candidates || data.candidates.length === 0) {
              return res.status(500).json({ error: 'Maaf, aku sedang bingung. Bisa ulangi pertanyaannya? 🥺' });
         }
