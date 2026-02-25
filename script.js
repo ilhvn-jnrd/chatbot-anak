@@ -56,8 +56,13 @@ async function handleSend() {
 }
 
 sendBtn.addEventListener('click', handleSend);
+
 userInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         handleSend();
     }
+});
+
+document.getElementById('clear-btn').addEventListener('click', () => {
+    chatBox.innerHTML = '<div class="message bot-message">Halo! Aku Teman Pintar. Ada yang ingin kamu tanyakan hari ini? 🌟</div>';
 });
