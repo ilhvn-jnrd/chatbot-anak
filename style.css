@@ -57,3 +57,22 @@ body {
     transition: background-color 0.2s;
 }
 #send-btn:hover { background-color: #ffa726; }
+
+/* Desain untuk kredit portofolio */
+.footer-credit {
+    text-align: center;
+    padding: 8px;
+    font-size: 0.75rem;
+    background-color: white;
+    color: #9e9e9e;
+}
+.footer-credit a {
+    color: #4dd0e1; /* Warna biru senada dengan tema header */
+    text-decoration: none;
+    font-weight: 800;
+    transition: color 0.2s;
+}
+.footer-credit a:hover {
+    color: #00acc1;
+    text-decoration: underline;
+}
