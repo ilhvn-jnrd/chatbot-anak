@@ -2,33 +2,59 @@ const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 
-// Fungsi untuk menambahkan pesan ke layar
 function addMessage(message, isUser) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('message');
     messageElement.classList.add(isUser ? 'user-message' : 'bot-message');
-    messageElement.textContent = message;
+    // Membaca baris baru dengan benar
+    messageElement.innerHTML = message.replace(/\n/g, '<br>');
     
     chatBox.appendChild(messageElement);
-    chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll ke bawah
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Fungsi utama saat tombol kirim ditekan
-function handleSend() {
+async function handleSend() {
     const text = userInput.value.trim();
     if (text !== '') {
-        // Tampilkan pesan user
         addMessage(text, true);
         userInput.value = '';
         
-        // Simulasi balasan bot (Ini akan kita ganti dengan AI sungguhan di Fase 4)
-        setTimeout(() => {
-            addMessage("Wah, menarik sekali! Nanti aku akan bisa membalas ini setelah otak AI-ku terpasang di Fase 4. 🧠✨", false);
-        }, 1000);
+        // Menampilkan indikator loading untuk anak-anak
+        const loadingId = 'loading-' + Date.now();
+        const loadingElement = document.createElement('div');
+        loadingElement.classList.add('message', 'bot-message');
+        loadingElement.id = loadingId;
+        loadingElement.textContent = 'Mengetik... ✍️';
+        chatBox.appendChild(loadingElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            // Memanggil API Vercel kita
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: text })
+            });
+
+            const data = await response.json();
+            
+            // Hapus indikator loading
+            document.getElementById(loadingId).remove();
+
+            if (data.reply) {
+                addMessage(data.reply, false);
+            } else {
+                addMessage(data.error || "Maaf, terjadi kesalahan. 😔", false);
+            }
+        } catch (error) {
+            document.getElementById(loadingId).remove();
+            addMessage("Aduh, koneksi terputus. Coba lagi ya! 🔌", false);
+        }
     }
 }
 
-// Trigger untuk klik tombol dan tekan tombol "Enter" di keyboard
 sendBtn.addEventListener('click', handleSend);
 userInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
