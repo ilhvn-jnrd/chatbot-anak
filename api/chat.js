@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-    // Memastikan hanya menerima permintaan pengiriman pesan
     if (req.method !== 'POST') {
         return res.status(405).json({ message: 'Hanya menerima method POST' });
     }
@@ -7,25 +6,27 @@ export default async function handler(req, res) {
     const { message } = req.body;
 
     try {
-        // Menghubungi API Gemini menggunakan kunci rahasia dari Vercel
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                system_instruction: {
+                    parts: { text: "Kamu adalah 'Teman Pintar', asisten AI yang ceria, ramah, dan edukatif khusus untuk anak-anak. Gunakan bahasa Indonesia yang sederhana, ceria, dan mudah dipahami anak-anak. Selalu berikan emoji yang relevan. Jangan pernah memberikan jawaban yang mengandung kekerasan, bahasa kasar, politik, atau topik dewasa. Jika ditanya hal berbahaya, alihkan pembicaraan ke hal yang menyenangkan dan mendidik." }
+                },
                 contents: [{ parts: [{ text: message }] }]
-                // Catatan: Keamanan anak-anak dan kepribadian bot akan kita tambahkan di sini pada Fase 4!
             })
         });
 
         const data = await response.json();
         
-        // Mengambil teks balasan dari AI
+        if (!data.candidates || data.candidates.length === 0) {
+             return res.status(500).json({ error: 'Maaf, aku sedang bingung. Bisa ulangi pertanyaannya? 🥺' });
+        }
+
         const botReply = data.candidates[0].content.parts[0].text;
-        
-        // Mengirimkan balasan kembali ke website kita
         return res.status(200).json({ reply: botReply });
     } catch (error) {
         console.error('Error:', error);
-        return res.status(500).json({ error: 'Aduh, otak AI-ku sedang pusing. Coba lagi nanti ya!' });
+        return res.status(500).json({ error: 'Aduh, otak AI-ku sedang pusing. Coba lagi nanti ya! 🤕' });
     }
 }
