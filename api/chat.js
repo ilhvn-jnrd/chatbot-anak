@@ -36,3 +36,5 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Aduh, otak AI-ku sedang pusing. Coba lagi nanti ya! 🤕' });
     }
 }
+
+// Trigger pembaruan API Key Vercel
